@@ -1,5 +1,4 @@
 #include "motor.h"
-#include "Arduino.h"
 
 // Date constructor
 Motor::Motor(int port_A, int port_B, uint32_t analog_port, int min_pos, int max_pos)

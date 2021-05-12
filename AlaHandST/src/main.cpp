@@ -1,14 +1,7 @@
 #include "Arduino.h"
 #include "motor.h"
-
-unsigned long PIDtime=0;
-int PWM=0;
-int dir=0;
-unsigned long time;
-int currentValue = 0;
-int delta = 0;
-char ch;
-unsigned char mtr[2];
+#include <string>
+#include <stdio.h>
 
 /**
  *  The finger ranges
@@ -32,15 +25,28 @@ void setup() {
 }
 
 
+std::string buffer;
+
 void loop() {
-  if (Serial.available() >= 4) { //whait untill a number send
-    mtr[0]=0;
-    for (int i=0;i<2;i++){
-        ch = Serial.read(); //imitate "do while"
+  int mtr = m3.getGoalPosCents();
+  if (Serial.available()) { //whait untill a number send
+    
+    
+    char ch = Serial.read(); //imitate "do while"
+    buffer.append(std::string(1,ch));
+    int n = buffer.length();
+    char char_array[n + 1];
+    strcpy(char_array, buffer.c_str());
+    if(ch == '\n'){
+      Serial.println("got the message");
+      int motor_inputs[6] = {0,0,0,0,0,0}; //100 100 100 100 100 100
+      
+      sscanf(char_array, "%i %i %i %i %i %i\n", motor_inputs[0], motor_inputs[1], motor_inputs[2], motor_inputs[3], motor_inputs[4], motor_inputs[5]);
+      Serial.printf("m3 is set to %i", motor_inputs[2]);
     }
+
   } 
   
-  time = millis();
   int epta = m3.getCurrentPos();
-  Serial.printf("current pos of m3 is %i\n", epta);
+  // Serial.printf("m1 is %i\t\tmtr set to %i\n", epta, mtr);
 }
