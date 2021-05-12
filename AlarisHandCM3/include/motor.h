@@ -11,7 +11,7 @@ private:
     int maxp;
     int currentPos;
     float goalPosCents;
-    uint32_t analogPort;
+    uint analogPort;
     float currentPosCents;
 
 public:
