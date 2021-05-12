@@ -19,7 +19,13 @@ unsigned char mtr[2];
  *  5. Thumb        0 -   0
  *  6. ?????        0 -   0
  * */
+// Motor m1(PB13, PB14, PA_0, 127, 301);
+// Motor m2(PB13, PB14, PA_0, 127, 301);
 Motor m3(PB13, PB14, PA_0, 127, 301);
+Motor m4(PB13, PB14, PA_0,  76, 315);
+// Motor m5(PB13, PB14, PA_0, 127, 301);
+// Motor m6(PB13, PB14, PA_0, 127, 301);
+
 
 void setup() {
   Serial.begin(115200);
