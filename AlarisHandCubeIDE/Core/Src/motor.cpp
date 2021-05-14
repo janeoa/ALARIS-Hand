@@ -6,15 +6,20 @@
  */
 
 #include "motor.h"
+#include "stm32f103x6.h"
 
 // Date constructor
-Motor::Motor(int port_A, int port_B, int analog_port, int min_pos, int max_pos)
+Motor::Motor(GPIO_TypeDef* port_A, uint16_t pin_A, GPIO_TypeDef* port_B, uint16_t pin_B, GPIO_TypeDef* port_adc, uint16_t pin_adc, int min_pos, int max_pos)
 {
     portA = port_A;
+    pinA  = pin_A;
     portB = port_B;
-    minp = min_pos;
-    maxp = max_pos;
-    analogPort = analog_port;
+    pinB  = pin_B;
+    portADC = port_adc;
+    pinADC  = pin_adc;
+    minp  = min_pos;
+    maxp  = max_pos;
+
 }
 
 void Motor::move(bool forward, int speed){

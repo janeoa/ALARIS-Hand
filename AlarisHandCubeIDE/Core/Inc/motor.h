@@ -7,13 +7,22 @@
 
 #ifndef INC_MOTOR_H_
 #define INC_MOTOR_H_
+#include <stdint.h>
+#include "stm32f103x6.h"
 
 class Motor
 {
 private:
     /* data */
-    int portA;
-    int portB;
+	GPIO_TypeDef* portA;
+	uint16_t pinA;
+
+	GPIO_TypeDef* portB;
+	uint16_t pinB;
+
+	GPIO_TypeDef* portADC;
+	uint16_t pinADC;
+
     int minp;
     int maxp;
     int currentPos;
@@ -22,7 +31,7 @@ private:
     float currentPosCents;
 
 public:
-    Motor(int port_A, int port_B, int analog_port, int min_pos, int max_pos);
+    Motor(GPIO_TypeDef* port_A, uint16_t pin_A, GPIO_TypeDef* port_B, uint16_t pin_B, GPIO_TypeDef* port_adc, uint16_t pin_adc, int min_pos, int max_pos);
 
     int min(){ return minp;}
     int max(){ return maxp;}
