@@ -15,3 +15,4 @@ This is an ALARIS project supervised by
 * STM32
 
 ## PCB on EAGLE
+![Image of PCB](PCB.png)
