@@ -1,0 +1,5 @@
+motor.cpp:11:1:Motor::Motor(int, int, int, int, int)	24	static
+motor.cpp:20:6:void Motor::move(bool, int)	24	static
+motor.cpp:28:7:float Motor::getCurrentPos()	16	static
+motor.cpp:33:7:float Motor::getCurrentPosCents()	16	static
+motor.cpp:38:6:void Motor::setPosCents(float)	16	static
