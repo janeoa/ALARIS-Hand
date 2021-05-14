@@ -1,0 +1,8 @@
+Partlist exported from /Volumes/Clouds/odrive/OneDrive/archive/2021 Summer/Alaris/AlarisHAND/PCB/AlmasHand1/AlarisHandV1.sch at 14.05.2021 11:31
+
+Qty Value         Device        Package       Parts                                         Description                          MF    MPN        OC_FARNELL OC_NEWARK POPULARITY
+1                 BLUE_PILL     BLUE_PILL     U$4                                                                                                                                
+7   22-23-2021    22-23-2021    22-23-2021    M1, M2, M3, M4, M5, M6, MOTOR_POWER_CONNECTOR .100" (2.54mm) Center Header - 2 Pin MOLEX 22-23-2021 1462926    25C3832   40        
+1   22-23-2041    22-23-2041    22-23-2041    UART                                          .100" (2.54mm) Center Header - 4 Pin MOLEX 22-23-2041 1462920    38C0355   21        
+3   POLOLUDRV8833 POLOLUDRV8833 POLOLUDRV8833 U$1, U$2, U$3                                                                                                                      
+1   SENSOR_RAIL   SENSOR_RAIL   SENSOR_RAIL   U$5                                                                                                                                
