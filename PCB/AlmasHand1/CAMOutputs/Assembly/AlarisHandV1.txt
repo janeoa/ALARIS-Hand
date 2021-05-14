@@ -1,4 +1,4 @@
-Partlist exported from /Volumes/Clouds/odrive/OneDrive/archive/2021 Summer/Alaris/AlarisHAND/PCB/AlmasHand1/AlarisHandV1.sch at 14.05.2021 11:31
+Partlist exported from /Volumes/Clouds/odrive/OneDrive/archive/2021 Summer/Alaris/AlarisHAND/PCB/AlmasHand1/AlarisHandV1.sch at 14.05.2021 13:16
 
 Qty Value         Device        Package       Parts                                         Description                          MF    MPN        OC_FARNELL OC_NEWARK POPULARITY
 1                 BLUE_PILL     BLUE_PILL     U$4                                                                                                                                

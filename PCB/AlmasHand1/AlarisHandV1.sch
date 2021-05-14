@@ -77,22 +77,22 @@
 <library name="AlarisHandLib">
 <packages>
 <package name="POLOLUDRV8833">
-<pad name="GND#2" x="2.54" y="12.7" drill="0.65" diameter="2.1844" shape="square"/>
-<pad name="VMM" x="2.54" y="10.16" drill="0.65" diameter="2.1844"/>
-<pad name="INB1" x="2.54" y="7.62" drill="0.65" diameter="2.1844"/>
-<pad name="INB2" x="2.54" y="5.08" drill="0.65" diameter="2.1844"/>
-<pad name="INA2" x="2.54" y="2.54" drill="0.65" diameter="2.1844"/>
-<pad name="INA1" x="2.54" y="0" drill="0.65" diameter="2.1844"/>
-<pad name="NSLP" x="2.54" y="-2.54" drill="0.65" diameter="2.1844"/>
-<pad name="NFTL" x="2.54" y="-5.08" drill="0.65" diameter="2.1844"/>
-<pad name="GND#1" x="-8.89" y="12.7" drill="0.65" diameter="2.1844" shape="square"/>
-<pad name="VIN" x="-8.89" y="10.16" drill="0.65" diameter="2.1844"/>
-<pad name="OUTB1" x="-8.89" y="7.62" drill="0.65" diameter="2.1844"/>
-<pad name="OUTB2" x="-8.89" y="5.08" drill="0.65" diameter="2.1844"/>
-<pad name="OUTA2" x="-8.89" y="2.54" drill="0.65" diameter="2.1844"/>
-<pad name="OUTA1" x="-8.89" y="0" drill="0.65" diameter="2.1844"/>
-<pad name="AISEN" x="-8.89" y="-2.54" drill="0.65" diameter="2.1844"/>
-<pad name="BISEN" x="-8.89" y="-5.08" drill="0.65" diameter="2.1844"/>
+<pad name="GND#2" x="2.54" y="12.7" drill="1.016" diameter="2.1844" shape="square"/>
+<pad name="VMM" x="2.54" y="10.16" drill="1.016" diameter="2.1844"/>
+<pad name="INB1" x="2.54" y="7.62" drill="1.016" diameter="2.1844"/>
+<pad name="INB2" x="2.54" y="5.08" drill="1.016" diameter="2.1844"/>
+<pad name="INA2" x="2.54" y="2.54" drill="1.016" diameter="2.1844"/>
+<pad name="INA1" x="2.54" y="0" drill="1.016" diameter="2.1844"/>
+<pad name="NSLP" x="2.54" y="-2.54" drill="1.016" diameter="2.1844"/>
+<pad name="NFTL" x="2.54" y="-5.08" drill="1.016" diameter="2.1844"/>
+<pad name="GND#1" x="-8.89" y="12.7" drill="1.016" diameter="2.286" shape="square"/>
+<pad name="VIN" x="-8.89" y="10.16" drill="1.016" diameter="2.286"/>
+<pad name="OUTB1" x="-8.89" y="7.62" drill="1.016" diameter="2.286"/>
+<pad name="OUTB2" x="-8.89" y="5.08" drill="1.016" diameter="2.286"/>
+<pad name="OUTA2" x="-8.89" y="2.54" drill="1.016" diameter="2.286"/>
+<pad name="OUTA1" x="-8.89" y="0" drill="1.016" diameter="2.286"/>
+<pad name="AISEN" x="-8.89" y="-2.54" drill="1.016" diameter="2.286"/>
+<pad name="BISEN" x="-8.89" y="-5.08" drill="1.016" diameter="2.286"/>
 <wire x1="-11.43" y1="15.24" x2="5.08" y2="15.24" width="0.127" layer="21"/>
 <wire x1="5.08" y1="15.24" x2="5.08" y2="-7.62" width="0.127" layer="21"/>
 <wire x1="5.08" y1="-7.62" x2="-11.43" y2="-7.62" width="0.127" layer="21"/>
@@ -101,14 +101,14 @@
 drv8833</text>
 </package>
 <package name="SENSOR_RAIL">
-<pad name="P$1" x="0" y="0" drill="0.762" diameter="2.032"/>
-<pad name="P$2" x="0" y="-2.54" drill="0.762" diameter="2.032"/>
-<pad name="P$3" x="0" y="-5.08" drill="0.762" diameter="2.032"/>
-<pad name="P$4" x="0" y="-7.62" drill="0.762" diameter="2.032"/>
-<pad name="P$5" x="0" y="-10.16" drill="0.762" diameter="2.032"/>
-<pad name="P$6" x="0" y="-12.7" drill="0.762" diameter="2.032"/>
-<pad name="GND" x="0" y="-15.24" drill="0.762" diameter="2.032" shape="square"/>
-<pad name="VCC" x="0" y="-17.78" drill="0.762" diameter="2.032"/>
+<pad name="P$1" x="0" y="0" drill="1.016" diameter="2.032"/>
+<pad name="P$2" x="0" y="-2.54" drill="1.016" diameter="2.032"/>
+<pad name="P$3" x="0" y="-5.08" drill="1.016" diameter="2.032"/>
+<pad name="P$4" x="0" y="-7.62" drill="1.016" diameter="2.032"/>
+<pad name="P$5" x="0" y="-10.16" drill="1.016" diameter="2.032"/>
+<pad name="P$6" x="0" y="-12.7" drill="1.016" diameter="2.032"/>
+<pad name="GND" x="0" y="-15.24" drill="1.016" diameter="2.032" shape="square"/>
+<pad name="VCC" x="0" y="-17.78" drill="1.016" diameter="2.032"/>
 </package>
 <package name="22-23-2021" urn="urn:adsk.eagle:footprint:8078259/1">
 <description>&lt;b&gt;KK® 254 Solid Header, Vertical, with Friction Lock, 2 Circuits, Tin (Sn) Plating&lt;/b&gt;&lt;p&gt;&lt;a href =http://www.molex.com/pdm_docs/sd/022232021_sd.pdf&gt;Datasheet &lt;/a&gt;</description>
