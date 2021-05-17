@@ -24,7 +24,9 @@
 /* USER CODE BEGIN Includes */
 #include "motor.h"
 #include <stdio.h>
+#include <inttypes.h>
 #include <cstring>
+#include <math.h>
 
 /* USER CODE END Includes */
 
@@ -44,6 +46,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
@@ -58,6 +61,7 @@ UART_HandleTypeDef huart1;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM1_Init(void);
@@ -79,8 +83,8 @@ static void MX_TIM3_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint16_t raw;
-	char msg[10];
+  char msg[100];
+  uint32_t rawadc[6];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -100,6 +104,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_USART1_UART_Init();
   MX_TIM1_Init();
@@ -107,7 +112,30 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
-  Motor m3(GPIOA, GPIO_PIN_0, GPIOA, GPIO_PIN_1, GPIOA, GPIO_PIN_4, 200, 250);
+  //Motor order 1->6: pinky (1), ring (2), middle (3), index (4), thumb1 (5), thumb2 (6)
+  Motor m1(GPIOA, GPIO_PIN_8 , GPIOA, GPIO_PIN_9 , 200, 250);
+  Motor m2(GPIOA, GPIO_PIN_10, GPIOA, GPIO_PIN_11, 200, 250);
+  Motor m3(GPIOA, GPIO_PIN_0 , GPIOA, GPIO_PIN_1 , 200, 900); //real 113 <-> 1051
+  Motor m4(GPIOB, GPIO_PIN_10, GPIOB, GPIO_PIN_11, 200, 250);
+  Motor m5(GPIOB, GPIO_PIN_4 , GPIOB, GPIO_PIN_5 , 200, 250);
+  Motor m6(GPIOB, GPIO_PIN_0 , GPIOB, GPIO_PIN_1 , 200, 250);
+
+  /**
+   * Starts ADC for all 6 joints and stores most current
+   * values of joints in the given array (rawadc)
+   * independently from the main loop.
+   */
+  HAL_ADC_Start_DMA(&hadc1, rawadc, 6);
+
+  HAL_Delay(20);
+  m1.init(rawadc[0]);
+  m2.init(rawadc[1]);
+  m3.init(rawadc[2]);
+  m4.init(rawadc[3]);
+  m5.init(rawadc[4]);
+  m6.init(rawadc[5]);
+
+
 
   /* USER CODE END 2 */
 
@@ -115,16 +143,24 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_ADC_Start(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	  raw = HAL_ADC_GetValue(&hadc1);
-	  sprintf(msg, "%hu\r\n", raw);
+//	  sprintf(msg, "%4" PRIu32 " | %4" PRIu32 " | %4" PRIu32 " | %4" PRIu32 " | %4" PRIu32 " | %4" PRIu32 "\r\n", rawadc[0], rawadc[1], rawadc[2], rawadc[3], rawadc[4], rawadc[5]);
+//	  sprintf(msg, "%d\r\n", (int)(m4.getCurrentPosCents(rawadc[3])));
+
+
+	  m2.setGoalPosCents(100);
+	  m2.tick(rawadc[1]);
+
+	  m3.setGoalPosCents(80);
+	  m3.tick(rawadc[2]);
+
+
+	  sprintf(msg, "middle: min[200] adc[%4" PRIu32 "] max[900] cents[%d]\r\n", rawadc[2], m3.getCurrentPosCents(rawadc[2]));
 	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
 
-	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-	  HAL_Delay(200);
-	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-	  HAL_Delay(200);
+//	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//	  HAL_Delay(200);
+//	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+//	  HAL_Delay(200);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -197,12 +233,12 @@ static void MX_ADC1_Init(void)
   /** Common config
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = 6;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -212,6 +248,46 @@ static void MX_ADC1_Init(void)
   sConfig.Channel = ADC_CHANNEL_2;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_3;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_4;
+  sConfig.Rank = ADC_REGULAR_RANK_3;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_5;
+  sConfig.Rank = ADC_REGULAR_RANK_4;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_6;
+  sConfig.Rank = ADC_REGULAR_RANK_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_7;
+  sConfig.Rank = ADC_REGULAR_RANK_6;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -337,14 +413,6 @@ static void MX_TIM2_Init(void)
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
@@ -455,6 +523,22 @@ static void MX_USART1_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -472,12 +556,22 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PA0 PA1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 

@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
+extern DMA_HandleTypeDef hdma_adc1;
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
@@ -114,6 +115,23 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /* ADC1 DMA Init */
+    /* ADC1 Init */
+    hdma_adc1.Instance = DMA1_Channel1;
+    hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_adc1.Init.Mode = DMA_CIRCULAR;
+    hdma_adc1.Init.Priority = DMA_PRIORITY_LOW;
+    if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(hadc,DMA_Handle,hdma_adc1);
+
   /* USER CODE BEGIN ADC1_MspInit 1 */
 
   /* USER CODE END ADC1_MspInit 1 */
@@ -148,6 +166,8 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     HAL_GPIO_DeInit(GPIOA, pot1_Pin|pot2_Pin|pot3_Pin|pot4_Pin
                           |pot5_Pin|pot6_Pin);
 
+    /* ADC1 DMA DeInit */
+    HAL_DMA_DeInit(hadc->DMA_Handle);
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
   /* USER CODE END ADC1_MspDeInit 1 */
@@ -229,19 +249,11 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 
   /* USER CODE END TIM2_MspPostInit 0 */
 
-    __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**TIM2 GPIO Configuration
-    PA0-WKUP     ------> TIM2_CH1
-    PA1     ------> TIM2_CH2
     PB10     ------> TIM2_CH3
     PB11     ------> TIM2_CH4
     */
-    GPIO_InitStruct.Pin = M3A_Pin|M3B_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
     GPIO_InitStruct.Pin = M4A_Pin|M4B_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

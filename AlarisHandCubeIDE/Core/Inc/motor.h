@@ -20,28 +20,30 @@ private:
 	GPIO_TypeDef* portB;
 	uint16_t pinB;
 
-	GPIO_TypeDef* portADC;
-	uint16_t pinADC;
+//	int portADC;
+//	uint16_t pinADC;
 
-    int minp;
-    int maxp;
-    int currentPos;
-    float goalPosCents;
-    int analogPort;
-    float currentPosCents;
+	uint32_t minp;
+	uint32_t maxp;
+//    uint32_t currentPos;
+    int goalPosCents;
+//    int analogPort;
+    int currentPosCents;
+    int deltaRaw;
 
 public:
-    Motor(GPIO_TypeDef* port_A, uint16_t pin_A, GPIO_TypeDef* port_B, uint16_t pin_B, GPIO_TypeDef* port_adc, uint16_t pin_adc, int min_pos, int max_pos);
+    Motor(GPIO_TypeDef* port_A, uint16_t pin_A, GPIO_TypeDef* port_B, uint16_t pin_B, int min_pos, int max_pos);
 
     int min(){ return minp;}
     int max(){ return maxp;}
 
     void move(bool forward, int speed);
-    void setPosCents(float percents);
+    void setGoalPosCents(int goal);
+    void tick(uint32_t curr);
+    void init(uint32_t init);
 
-    float getGoalPosCents(){return goalPosCents;}
-    float getCurrentPos();
-    float getCurrentPosCents();
+    int getGoalPosCents(){return goalPosCents;}
+    int getCurrentPosCents(uint32_t raw);
 };
 
 

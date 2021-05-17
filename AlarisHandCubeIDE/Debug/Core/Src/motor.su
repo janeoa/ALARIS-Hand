@@ -1,5 +1,6 @@
-motor.cpp:12:1:Motor::Motor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, int, int)	24	static
-motor.cpp:25:6:void Motor::move(bool, int)	24	static
-motor.cpp:33:7:float Motor::getCurrentPos()	16	static
-motor.cpp:38:7:float Motor::getCurrentPosCents()	16	static
-motor.cpp:43:6:void Motor::setPosCents(float)	16	static
+motor.cpp:13:1:Motor::Motor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, int, int)	24	static
+motor.cpp:26:6:void Motor::move(bool, int)	24	static
+motor.cpp:34:5:int Motor::getCurrentPosCents(uint32_t)	16	static
+motor.cpp:40:6:void Motor::setGoalPosCents(int)	16	static
+motor.cpp:44:6:void Motor::init(uint32_t)	16	static
+motor.cpp:48:6:void Motor::tick(uint32_t)	24	static
