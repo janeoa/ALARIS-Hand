@@ -9,15 +9,16 @@
 #define INC_MOTOR_H_
 #include <stdint.h>
 #include "stm32f103x6.h"
+#include "main.h"
 
 class Motor
 {
 private:
     /* data */
-	GPIO_TypeDef* portA;
+	TIM_HandleTypeDef portA;
 	uint16_t pinA;
 
-	GPIO_TypeDef* portB;
+	TIM_HandleTypeDef portB;
 	uint16_t pinB;
 
 //	int portADC;
@@ -32,7 +33,7 @@ private:
     int deltaRaw;
 
 public:
-    Motor(GPIO_TypeDef* port_A, uint16_t pin_A, GPIO_TypeDef* port_B, uint16_t pin_B, int min_pos, int max_pos);
+    Motor(TIM_HandleTypeDef port_A, uint16_t pin_A, TIM_HandleTypeDef port_B, uint16_t pin_B, int min_pos, int max_pos);
 
     int min(){ return minp;}
     int max(){ return maxp;}

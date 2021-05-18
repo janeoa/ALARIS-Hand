@@ -74,6 +74,7 @@ static void MX_TIM3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
 /* USER CODE END 0 */
 
 /**
@@ -113,12 +114,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //Motor order 1->6: pinky (1), ring (2), middle (3), index (4), thumb1 (5), thumb2 (6)
-  Motor m1(GPIOA, GPIO_PIN_8 , GPIOA, GPIO_PIN_9 , 200, 250);
-  Motor m2(GPIOA, GPIO_PIN_10, GPIOA, GPIO_PIN_11, 200, 250);
-  Motor m3(GPIOA, GPIO_PIN_0 , GPIOA, GPIO_PIN_1 , 200, 900); //real 113 <-> 1051
-  Motor m4(GPIOB, GPIO_PIN_10, GPIOB, GPIO_PIN_11, 200, 250);
-  Motor m5(GPIOB, GPIO_PIN_4 , GPIOB, GPIO_PIN_5 , 200, 250);
-  Motor m6(GPIOB, GPIO_PIN_0 , GPIOB, GPIO_PIN_1 , 200, 250);
+  Motor m1(htim1, TIM_CHANNEL_1, htim1, TIM_CHANNEL_2, 200, 900);
+  Motor m2(htim1, TIM_CHANNEL_3, htim1, TIM_CHANNEL_4, 200, 900);
+  Motor m3(htim2, TIM_CHANNEL_1, htim2, TIM_CHANNEL_2, 200, 900);
+  Motor m4(htim2, TIM_CHANNEL_3, htim2, TIM_CHANNEL_4, 200, 250);
+  Motor m5(htim3, TIM_CHANNEL_1, htim3, TIM_CHANNEL_2, 200, 250);
+  Motor m6(htim3, TIM_CHANNEL_3, htim3, TIM_CHANNEL_4, 200, 250);
 
   /**
    * Starts ADC for all 6 joints and stores most current
@@ -136,7 +137,22 @@ int main(void)
   m6.init(rawadc[5]);
 
 
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
+
+//  HAL_TIM_PWM_ConfigChannel(htim, sConfig, Channel)
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -147,14 +163,17 @@ int main(void)
 //	  sprintf(msg, "%d\r\n", (int)(m4.getCurrentPosCents(rawadc[3])));
 
 
-	  m2.setGoalPosCents(100);
-	  m2.tick(rawadc[1]);
+//	  m1.setGoalPosCents(100);
+//	  m1.tick(rawadc[0]);
 
-	  m3.setGoalPosCents(80);
+//	  m2.setGoalPosCents(100);
+//	  m2.tick(rawadc[1]);
+
+	  m3.setGoalPosCents(100);
 	  m3.tick(rawadc[2]);
 
 
-	  sprintf(msg, "middle: min[200] adc[%4" PRIu32 "] max[900] cents[%d]\r\n", rawadc[2], m3.getCurrentPosCents(rawadc[2]));
+	  sprintf(msg, "pinky:adc[%4" PRIu32 "] cents[%d]\tmiddle: adc[%4" PRIu32 "] cents[%d]\r\n\r\n", rawadc[0], m1.getCurrentPosCents(rawadc[0]),rawadc[2], m3.getCurrentPosCents(rawadc[2]));
 	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
 
 //	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
@@ -318,9 +337,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 0;
+  htim1.Init.Prescaler = 64;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 65535;
+  htim1.Init.Period = 255;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -394,9 +413,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
+  htim2.Init.Prescaler = 64;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 65535;
+  htim2.Init.Period = 255;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
@@ -413,6 +432,14 @@ static void MX_TIM2_Init(void)
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
@@ -447,9 +474,9 @@ static void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
+  htim3.Init.Prescaler = 64;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
+  htim3.Init.Period = 255;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
@@ -556,22 +583,12 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0|GPIO_PIN_1, GPIO_PIN_RESET);
-
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PA0 PA1 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 
