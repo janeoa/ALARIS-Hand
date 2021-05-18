@@ -157,6 +157,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int goal = 0;
+
   while (1)
   {
 //	  sprintf(msg, "%4" PRIu32 " | %4" PRIu32 " | %4" PRIu32 " | %4" PRIu32 " | %4" PRIu32 " | %4" PRIu32 "\r\n", rawadc[0], rawadc[1], rawadc[2], rawadc[3], rawadc[4], rawadc[5]);
@@ -169,11 +171,20 @@ int main(void)
 //	  m2.setGoalPosCents(100);
 //	  m2.tick(rawadc[1]);
 
-	  m3.setGoalPosCents(100);
+	  m3.setGoalPosCents(goal);
 	  m3.tick(rawadc[2]);
 
+	  if(m3.getCurrentPosCents(rawadc[2]) > 98 && m3.getCurrentPosCents(rawadc[2]) < 102){
+		  goal = 0;
+	  }
 
-	  sprintf(msg, "pinky:adc[%4" PRIu32 "] cents[%d]\tmiddle: adc[%4" PRIu32 "] cents[%d]\r\n\r\n", rawadc[0], m1.getCurrentPosCents(rawadc[0]),rawadc[2], m3.getCurrentPosCents(rawadc[2]));
+	  if(m3.getCurrentPosCents(rawadc[2]) > -2 && m3.getCurrentPosCents(rawadc[2]) < 2){
+		  goal = 100;
+	  }
+
+	  uint32_t millis = HAL_GetTick();
+
+	  sprintf(msg, "%d\t%4" PRIu32 "\t%4" PRIu32 "\t%d\r\n", goal, millis,rawadc[2], m3.getCurrentPosCents(rawadc[2]));
 	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
 
 //	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
