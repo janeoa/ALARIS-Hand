@@ -11,26 +11,31 @@
 #include "stm32f103x6.h"
 #include "main.h"
 
+#define number_of_steps 5
+
+
 class Motor
 {
 private:
-    /* data */
+	/* ports */
 	TIM_HandleTypeDef portA;
 	uint16_t pinA;
 
 	TIM_HandleTypeDef portB;
 	uint16_t pinB;
 
-//	int portADC;
-//	uint16_t pinADC;
-
+	/* constrains */
 	uint32_t minp;
 	uint32_t maxp;
-//    uint32_t currentPos;
+
+	/* math */
     int goalPosCents;
-//    int analogPort;
     int currentPosCents;
     int deltaRaw;
+
+    /* states */
+    int state;
+    int steps[number_of_steps];
 
 public:
     Motor(TIM_HandleTypeDef port_A, uint16_t pin_A, TIM_HandleTypeDef port_B, uint16_t pin_B, int min_pos, int max_pos);
@@ -38,13 +43,15 @@ public:
     int min(){ return minp;}
     int max(){ return maxp;}
 
-    void move(bool forward, int speed);
     void setGoalPosCents(int goal);
     void tick(uint32_t curr);
     void init(uint32_t init);
 
     int getGoalPosCents(){return goalPosCents;}
     int getCurrentPosCents(uint32_t raw);
+
+    int  getState(){return state;}
+    int* getSteps(){return steps;}
 };
 
 

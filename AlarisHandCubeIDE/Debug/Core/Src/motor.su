@@ -1,7 +1,6 @@
-motor.cpp:13:1:Motor::Motor(TIM_HandleTypeDef, uint16_t, TIM_HandleTypeDef, uint16_t, int, int)	16	static
-motor.cpp:26:6:void Motor::move(bool, int)	24	static
-motor.cpp:34:5:int Motor::getCurrentPosCents(uint32_t)	16	static
-motor.cpp:40:6:void Motor::setGoalPosCents(int)	16	static
-motor.cpp:44:6:void Motor::init(uint32_t)	16	static
-motor.cpp:48:6:void setPWM(TIM_HandleTypeDef, uint32_t, uint16_t, uint16_t)	40	static
-motor.cpp:62:6:void Motor::tick(uint32_t)	112	static
+motor.cpp:17:1:Motor::Motor(TIM_HandleTypeDef, uint16_t, TIM_HandleTypeDef, uint16_t, int, int)	16	static
+motor.cpp:40:5:int Motor::getCurrentPosCents(uint32_t)	16	static
+motor.cpp:46:6:void Motor::setGoalPosCents(int)	16	static
+motor.cpp:50:6:void Motor::init(uint32_t)	24	static
+motor.cpp:57:6:void setPWM(TIM_HandleTypeDef, uint32_t, uint16_t, uint16_t)	40	static
+motor.cpp:71:6:void Motor::tick(uint32_t)	112	static

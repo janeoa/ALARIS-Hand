@@ -28,6 +28,8 @@
 #include <cstring>
 #include <math.h>
 
+#define number_of_steps 5
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -182,10 +184,30 @@ int main(void)
 		  goal = 100;
 	  }
 
+
 	  uint32_t millis = HAL_GetTick();
 
 	  sprintf(msg, "%d\t%4" PRIu32 "\t%4" PRIu32 "\t%d\r\n", goal, millis,rawadc[2], m3.getCurrentPosCents(rawadc[2]));
+//	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+
+	  int *getstepsa = m3.getSteps();
+	  int getsteps[number_of_steps];
+	  for (int i=0; i<number_of_steps; i++){
+		  getsteps[i] = *getstepsa;
+		  getstepsa = getstepsa+1;
+	  }
+
+	  bool same = true;
+	  int reference = getsteps[0];
+	  int tolerance = 20;
+	  for (int i=1; i<number_of_steps; i++){
+		  if(getsteps[i] < reference - tolerance || getsteps[i] > reference + tolerance) same = false;
+	  }
+
+	  sprintf(msg,"%8" PRIu32 "\t%d\t%d\t%d\t%d\t%d\t%d\r\n", millis, getsteps[0], getsteps[1], getsteps[2], getsteps[3],getsteps[4], same);
 	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+
+
 
 //	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
 //	  HAL_Delay(200);
