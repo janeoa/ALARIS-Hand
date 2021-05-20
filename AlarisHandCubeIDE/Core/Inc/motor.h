@@ -11,8 +11,10 @@
 #include "stm32f103x6.h"
 #include "main.h"
 
-#define number_of_steps 5
-
+#define number_of_steps 60
+#define READY 	0
+#define MOVING  1
+#define STALLED 2
 
 class Motor
 {
@@ -52,6 +54,7 @@ public:
 
     int  getState(){return state;}
     int* getSteps(){return steps;}
+    void setState(int new_state);
 };
 
 

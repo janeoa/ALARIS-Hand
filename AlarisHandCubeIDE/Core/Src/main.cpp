@@ -28,7 +28,7 @@
 #include <cstring>
 #include <math.h>
 
-#define number_of_steps 5
+//#define number_of_steps 100
 
 /* USER CODE END Includes */
 
@@ -176,13 +176,7 @@ int main(void)
 	  m3.setGoalPosCents(goal);
 	  m3.tick(rawadc[2]);
 
-	  if(m3.getCurrentPosCents(rawadc[2]) > 98 && m3.getCurrentPosCents(rawadc[2]) < 102){
-		  goal = 0;
-	  }
 
-	  if(m3.getCurrentPosCents(rawadc[2]) > -2 && m3.getCurrentPosCents(rawadc[2]) < 2){
-		  goal = 100;
-	  }
 
 
 	  uint32_t millis = HAL_GetTick();
@@ -197,11 +191,26 @@ int main(void)
 		  getstepsa = getstepsa+1;
 	  }
 
+	  if(m3.getCurrentPosCents(rawadc[2]) > 98 && m3.getCurrentPosCents(rawadc[2]) < 102){
+		  goal = 0;
+		  getsteps[number_of_steps-1] = 1000;
+	  }
+
+	  if(m3.getCurrentPosCents(rawadc[2]) > -2 && m3.getCurrentPosCents(rawadc[2]) < 2){
+		  goal = 100;
+		  getsteps[number_of_steps-1] = 1000;
+	  }
+
 	  bool same = true;
 	  int reference = getsteps[0];
-	  int tolerance = 20;
+	  int tolerance = 10;
 	  for (int i=1; i<number_of_steps; i++){
 		  if(getsteps[i] < reference - tolerance || getsteps[i] > reference + tolerance) same = false;
+	  }
+
+
+	  if(same){
+		  m3.setState(STALLED);
 	  }
 
 	  sprintf(msg,"%8" PRIu32 "\t%d\t%d\t%d\t%d\t%d\t%d\r\n", millis, getsteps[0], getsteps[1], getsteps[2], getsteps[3],getsteps[4], same);
