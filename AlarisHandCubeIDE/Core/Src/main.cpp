@@ -55,6 +55,8 @@ TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
 
@@ -87,6 +89,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   char msg[100];
+  uint8_t rxm[10];
   uint32_t rawadc[6];
   /* USER CODE END 1 */
 
@@ -118,7 +121,7 @@ int main(void)
   //Motor order 1->6: pinky (1), ring (2), middle (3), index (4), thumb1 (5), thumb2 (6)
   Motor m1(htim1, TIM_CHANNEL_1, htim1, TIM_CHANNEL_2, 200, 900);
   Motor m2(htim1, TIM_CHANNEL_3, htim1, TIM_CHANNEL_4, 200, 900);
-  Motor m3(htim2, TIM_CHANNEL_1, htim2, TIM_CHANNEL_2, 200, 900);
+  Motor m3(htim2, TIM_CHANNEL_1, htim2, TIM_CHANNEL_2, 200, 1040);
   Motor m4(htim2, TIM_CHANNEL_3, htim2, TIM_CHANNEL_4, 200, 250);
   Motor m5(htim3, TIM_CHANNEL_1, htim3, TIM_CHANNEL_2, 200, 250);
   Motor m6(htim3, TIM_CHANNEL_3, htim3, TIM_CHANNEL_4, 200, 250);
@@ -129,6 +132,10 @@ int main(void)
    * independently from the main loop.
    */
   HAL_ADC_Start_DMA(&hadc1, rawadc, 6);
+  HAL_UART_Transmit_DMA(&huart1, (uint8_t*)msg, strlen(msg));
+//  HAL_UART_Receive_DMA(&huart1, rxm, 10);
+//  uint8_t dummy[3] = {0x40,0x0D,0x0A};
+//  HAL_UART_Transmit_DMA(&huart1, (uint8_t*)msg, strlen(msg));
 
   HAL_Delay(20);
   m1.init(rawadc[0]);
@@ -181,7 +188,7 @@ int main(void)
 
 	  uint32_t millis = HAL_GetTick();
 
-	  sprintf(msg, "%d\t%4" PRIu32 "\t%4" PRIu32 "\t%d\r\n", goal, millis,rawadc[2], m3.getCurrentPosCents(rawadc[2]));
+//	  sprintf(msg, "%d\t%4" PRIu32 "\t%4" PRIu32 "\t%d\r\n", goal, millis,rawadc[2], m3.getCurrentPosCents(rawadc[2]));
 //	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
 
 	  int *getstepsa = m3.getSteps();
@@ -210,11 +217,14 @@ int main(void)
 
 
 	  if(same){
-		  m3.setState(STALLED);
+//		  m3.setState(STALLED);
 	  }
 
-	  sprintf(msg,"%8" PRIu32 "\t%d\t%d\t%d\t%d\t%d\t%d\r\n", millis, getsteps[0], getsteps[1], getsteps[2], getsteps[3],getsteps[4], same);
-	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+	  HAL_UART_DMAStop(&huart1);
+	  sprintf(msg,"%8" PRIu32 "\t%4d\t%4d\t%4d\t%4d\t%4d\t%4d\t%4d\r\n", millis, getsteps[0], getsteps[1], getsteps[2], getsteps[3],getsteps[4], same, m3.getCurrentPosCents(rawadc[2]));
+	  HAL_UART_DMAResume(&huart1);
+
+//	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
 
 
 
@@ -604,6 +614,12 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  /* DMA1_Channel4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+  /* DMA1_Channel5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 
 }
 
@@ -635,6 +651,10 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+//	__NOP();
+//}
 
 /* USER CODE END 4 */
 
