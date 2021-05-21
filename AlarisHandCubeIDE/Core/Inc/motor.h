@@ -11,7 +11,9 @@
 #include "stm32f103x6.h"
 #include "main.h"
 
-#define number_of_steps 60
+
+#define cent_tolerance 2
+#define number_of_steps 30
 #define READY 	0
 #define MOVING  1
 #define STALLED 2
@@ -34,6 +36,7 @@ private:
     int goalPosCents;
     int currentPosCents;
     int deltaRaw;
+    int lastStop;
 
     /* states */
     int state;
@@ -55,6 +58,7 @@ public:
     int  getState(){return state;}
     int* getSteps(){return steps;}
     void setState(int new_state);
+    int  getLastStop(){return lastStop;}
 };
 
 

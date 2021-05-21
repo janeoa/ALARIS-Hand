@@ -59,7 +59,7 @@ DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
-
+bool readavainlable = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,8 +88,8 @@ static void MX_TIM3_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  char msg[100];
-  uint8_t rxm[10];
+  char msg[40];
+  uint8_t rxm[30];
   uint32_t rawadc[6];
   /* USER CODE END 1 */
 
@@ -132,8 +132,8 @@ int main(void)
    * independently from the main loop.
    */
   HAL_ADC_Start_DMA(&hadc1, rawadc, 6);
-  HAL_UART_Transmit_DMA(&huart1, (uint8_t*)msg, strlen(msg));
-//  HAL_UART_Receive_DMA(&huart1, rxm, 10);
+//  HAL_UART_Transmit_DMA(&huart1, (uint8_t*)msg, strlen(msg));
+  HAL_UART_Receive_DMA(&huart1, rxm, 10);
 //  uint8_t dummy[3] = {0x40,0x0D,0x0A};
 //  HAL_UART_Transmit_DMA(&huart1, (uint8_t*)msg, strlen(msg));
 
@@ -180,7 +180,7 @@ int main(void)
 //	  m2.setGoalPosCents(100);
 //	  m2.tick(rawadc[1]);
 
-	  m3.setGoalPosCents(goal);
+//	  m3.setGoalPosCents(goal);
 	  m3.tick(rawadc[2]);
 
 
@@ -198,15 +198,15 @@ int main(void)
 		  getstepsa = getstepsa+1;
 	  }
 
-	  if(m3.getCurrentPosCents(rawadc[2]) > 98 && m3.getCurrentPosCents(rawadc[2]) < 102){
-		  goal = 0;
-		  getsteps[number_of_steps-1] = 1000;
-	  }
-
-	  if(m3.getCurrentPosCents(rawadc[2]) > -2 && m3.getCurrentPosCents(rawadc[2]) < 2){
-		  goal = 100;
-		  getsteps[number_of_steps-1] = 1000;
-	  }
+//	  if(m3.getCurrentPosCents(rawadc[2]) > 98 && m3.getCurrentPosCents(rawadc[2]) < 102){
+//		  goal = 0;
+//		  getsteps[number_of_steps-1] = 1000;
+//	  }
+//
+//	  if(m3.getCurrentPosCents(rawadc[2]) > -2 && m3.getCurrentPosCents(rawadc[2]) < 2){
+//		  goal = 100;
+//		  getsteps[number_of_steps-1] = 1000;
+//	  }
 
 	  bool same = true;
 	  int reference = getsteps[0];
@@ -216,16 +216,30 @@ int main(void)
 	  }
 
 
-	  if(same){
-//		  m3.setState(STALLED);
+	  if(m3.getState()==MOVING && same){
+		  m3.setState(STALLED);
 	  }
 
-	  HAL_UART_DMAStop(&huart1);
-	  sprintf(msg,"%8" PRIu32 "\t%4d\t%4d\t%4d\t%4d\t%4d\t%4d\t%4d\r\n", millis, getsteps[0], getsteps[1], getsteps[2], getsteps[3],getsteps[4], same, m3.getCurrentPosCents(rawadc[2]));
-	  HAL_UART_DMAResume(&huart1);
+//	  HAL_UART_DMAStop(&huart1);
+//	  sprintf(msg,"%8" PRIu32 "\t%4d\t%4d\t%4d\t%4d\t%4d\t%4d\t%4d\r\n", millis, getsteps[0], getsteps[1], getsteps[2], getsteps[3],getsteps[4], same, m3.getCurrentPosCents(rawadc[2]));
+	  sprintf(msg,"%8" PRIu32 "\t%d\t%6" PRIu32 "\t%3d\r\n", millis, m3.getState(), rawadc[2], m3.getCurrentPosCents(rawadc[2]));
+	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
 
-//	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-
+	  char * pch;
+	  pch = strstr((char*)rxm, "open");
+	  if(pch != NULL) {
+		  HAL_UART_DMAStop(&huart1);
+		  HAL_UART_Receive_DMA(&huart1, rxm, 10);
+		  strncpy (pch,"    ",1);
+		  m3.setGoalPosCents(100);
+	  }
+	  pch = strstr((char*)rxm, "close");
+	  if(pch != NULL) {
+		  HAL_UART_DMAStop(&huart1);
+		  HAL_UART_Receive_DMA(&huart1, rxm, 10);
+		  strncpy (pch,"     ",1);
+		  m3.setGoalPosCents(0);
+	  }
 
 
 //	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
@@ -652,9 +666,10 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-//	__NOP();
-//}
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+	readavainlable = true;
+}
+
 
 /* USER CODE END 4 */
 

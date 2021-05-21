@@ -8,7 +8,7 @@
 #include "motor.h"
 #include "stm32f103x6.h"
 #include "main.h"
-
+#include "stdlib.h"
 
 
 // Date constructor
@@ -43,12 +43,15 @@ int Motor::getCurrentPosCents(uint32_t raw_adc_val){
 
 void Motor::setGoalPosCents(int goal){
 	goalPosCents = goal;
+	steps[number_of_steps-1] = 10000;
+	state = MOVING;
 }
 
 void Motor::init(uint32_t init){
-	int current = this->getCurrentPosCents(init);
+	goalPosCents = this->getCurrentPosCents(init);
+
 	for (int i=0; i<number_of_steps;i++){
-		steps[i]=current;
+		steps[i]=init;
 	}
 }
 
@@ -67,17 +70,20 @@ timer.Init.Period = period; // set the period duration HAL_TIM_PWM_Init(&timer);
 }
 
 void Motor::tick(uint32_t curr){
-	if(state == READY){
+	for (int i = 0; i<number_of_steps-1; i++){
+		steps[i]=steps[i+1];
+	}
+	steps[number_of_steps-1]=curr;
+
+	if(state == READY || state == MOVING){
 		int given = 100 * (int(curr) - int(minp)) / deltaRaw;
 
-		for (int i = 0; i<number_of_steps-1; i++){
-			steps[i]=steps[i+1];
-		}
-		steps[number_of_steps-1]=curr;
 		// TOD PID
-		//	int local_delta = given - goalPosCents;
+		int local_delta = given - goalPosCents;
 
-		if(given > goalPosCents - 2 && given < goalPosCents + 2){
+		state = (abs(local_delta)>cent_tolerance)? MOVING: READY;
+
+		if(given > goalPosCents - cent_tolerance && given < goalPosCents + cent_tolerance){
 			setPWM(portA, pinA, 255, 0);
 			setPWM(portB, pinB, 255, 0);
 		}else	if(given > goalPosCents){
@@ -90,6 +96,7 @@ void Motor::tick(uint32_t curr){
 	}
 
 	if (state == STALLED){
+//		lastStop = curr;
 		setPWM(portA, pinA, 255, 0);
 		setPWM(portB, pinB, 255, 0);
 	}
